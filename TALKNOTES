@@ -31,3 +31,19 @@ Notice: Compiled catalog for tcinel.home.timcinel.com in environment production 
 Error: /Stage[main]/Main/Nexus3_repository[blah]: Could not evaluate: No ability to determine if nexus3_repository exists
 Notice: Finished catalog run in 0.03 seconds
 
+
+Before implementing the provider, we refactored the utility classes so they can be conveniently used by a provider.
+
+
+Implemented bare minimum required to use 'puppet resource' in the nexus3_repository provider. It works now:
+
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_repository
+nexus3_repository { 'blahblah':
+  ensure => 'present',
+}
+nexus3_repository { 'maven-releases':
+  ensure => 'present',
+}
+nexus3_repository { 'maven-snapshots':
+  ensure => 'present',
+}
