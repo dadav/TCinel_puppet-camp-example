@@ -24,4 +24,10 @@ Notice: Compiled catalog for tcinel.home.timcinel.com in environment production 
 Notice: Finished catalog run in 0.03 seconds
 ```
 
+Made nexus3_repository ensurable, which breaks puppet apply again:
+
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "nexus3_repository {'blah': }"
+Notice: Compiled catalog for tcinel.home.timcinel.com in environment production in 0.01 seconds
+Error: /Stage[main]/Main/Nexus3_repository[blah]: Could not evaluate: No ability to determine if nexus3_repository exists
+Notice: Finished catalog run in 0.03 seconds
 
