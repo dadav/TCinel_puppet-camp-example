@@ -62,8 +62,6 @@ nexus3_repository { 'maven-snapshots':
 Implemented create and destroy methods in the provider
 
 ```
-~/build/puppet-camp  master ✗                                                                                                                         17m ⚑
-```
 ▶ RUBYLIB=$(pwd)/lib puppet apply -e "nexus3_repository {'zigzug': ensure => present }"
 Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.03 seconds
 Notice: /Stage[main]/Main/Nexus3_repository[zigzug]/ensure: created
@@ -150,5 +148,37 @@ nexus3_repository { 'zigzug':
   ensure => 'present',
   online => 'false',
 }
+
+* * *
+
+Added a new 'blobstore' property to the nexus3_repository type.
+
+This property is immutable, making things mildly interesting.
+
+```
+# no repositories
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_repository
+
+# create a new repository with a different blobstore
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true } nexus3_repository {'zigzug': ensure => present, online => true, blobstore => 'zuperduper', }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.08 seconds
+Notice: /Stage[main]/Main/Nexus3_repository[zigzug]/ensure: created
+Notice: Finished catalog run in 0.16 seconds
+
+# new blobstore is being used
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_repository
+nexus3_repository { 'zigzug':
+  ensure    => 'present',
+  blobstore => 'zuperduper',
+  online    => 'true',
+}
+
+# attempt and fail to change blobstore
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true } nexus3_repository {'zigzug': ensure => present, online => true, blobstore => 'default', }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.06 seconds
+Error: blobstore property is immutable
+Error: /Stage[main]/Main/Nexus3_repository[zigzug]/blobstore: change from zuperduper to default failed: blobstore property is immutable
+Notice: Finished catalog run in 0.06 seconds
+```
 
 * * *

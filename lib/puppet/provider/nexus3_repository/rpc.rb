@@ -1,3 +1,5 @@
+require 'deep_merge'
+
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'client.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'util.rb'))
 
@@ -9,7 +11,6 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
         :layoutPolicy => :STRICT,
       },
       :storage => {
-        :blobStoreName => :default,
         :strictContentTypeValidation => :true,
         :writePolicy => :ALLOW_ONCE,
       },
@@ -17,7 +18,6 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
     :format => '',
     :type => '',
     :url => '',
-    :online => :true,
     :recipe => 'maven2-hosted',
   }
 
@@ -30,12 +30,15 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
     repositories = Nexus3::Client.remote('coreui_Repository', 'read', nil)['result']['data']
 
     repositories.select { |repository|
+      Puppet::debug("Considering repository: #{repository['name']}")
       repository['recipe'] == 'maven2-hosted'
     }.collect { |repository|
+      Puppet::debug("Selected repository: #{repository}")
       new(
-        :ensure => :present,
-        :name   => repository['name'],
-        :online => Nexus3::Util.munge_boolean(repository['online']),
+        :ensure    => :present,
+        :name      => repository['name'],
+        :online    => Nexus3::Util.munge_boolean(repository['online']),
+        :blobstore => repository['attributes']['storage']['blobStoreName'],
       )
     }
   end
@@ -55,31 +58,42 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
 
   def create
     result = Nexus3::Client.remote('coreui_Repository', 'create', map_resource_to_data)
-    Puppet::debug("nexus3_repository create result: #{result}")
+    check_operation_result('create', result)
   end
 
   def destroy
     result = Nexus3::Client.remote('coreui_Repository', 'remove', [resource[:name]])
-    Puppet::debug("nexus3_repository destroy result: #{result}")
+    check_operation_result('destroy', result)
   end
 
   def flush
     if @flush_required
       result = Nexus3::Client.remote('coreui_Repository', 'update', map_resource_to_data)
-
-      Puppet::debug("nexus3_repository update result: #{result}")
-      fail() unless result['result']['success']
+      check_operation_result('flush', result)
 
       @property_hash = resource.to_hash
     end
   end
 
+  def check_operation_result(operation, result)
+    Puppet::debug("nexus3_repository #{operation} result: #{result}")
+    unless result['result']['success']
+      fail("Failed to #{operation} nexus3_repository") 
+      raise Puppet::Error, "#{operation} failed"
+    end
+  end
+
   def map_resource_to_data
     [
-      MAVEN_REPO_SKELETON.merge(
+      MAVEN_REPO_SKELETON.deep_merge(
         {
-          :name   => resource[:name],
-          :online => Nexus3::Util.sym_to_bool(resource[:online]),
+          :name    => resource[:name],
+          :online  => Nexus3::Util.sym_to_bool(resource[:online]),
+          :attributes => {
+            :storage => {
+              :blobStoreName => resource[:blobstore],
+            },
+          },
         }
       )
     ]
@@ -91,6 +105,14 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
 
   def online=(value)
     @flush_required = true
+  end
+
+  def blobstore
+    @property_hash[:blobstore]
+  end
+
+  def blobstore=(value)
+    fail('blobstore property is immutable')
   end
 
 end
