@@ -32,6 +32,7 @@ class ExtDirect
       raise "Error Making Request"
     end
 
+    return JSON.parse(response.body)
   end
 
 end

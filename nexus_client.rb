@@ -31,12 +31,16 @@ class NexusClient
     end
   end
 
+  def remote(*args, &block)
+    self.extdirect_client.remote(*args, &block)
+  end
+
   def extdirect_client
     @extdirect_client || begin
       @extdirect_client = ::ExtDirect.new(
         "#{@base_url}/service/extdirect",
-        {'NXSESSIONID' => self.session},
+        {:cookie => "NXSESSIONID=#{self.session}"},
       )
+    end
   end
-
 end
