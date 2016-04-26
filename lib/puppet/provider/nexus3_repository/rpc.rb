@@ -33,6 +33,15 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
     }
   end
 
+  def self.prefetch(resources)
+    repositories = instances
+    resources.keys.each do |name|
+      if provider = repositories.find { |repository| repository.name == name }
+        resources[name].provider = provider
+      end
+    end
+  end
+
   def exists?
     @property_hash[:ensure] == :present
   end

@@ -100,3 +100,22 @@ nexus3_repository { 'zigzug':
 ```
 
 * * *
+
+But I forgot to add prefetch so Puppet would try to recreate repos that were already there.
+Fixed now:
+
+```
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.02 seconds
+Notice: /Stage[main]/Main/Nexus3_repository[zigzug]/ensure: removed
+Notice: Finished catalog run in 0.07 seconds
+
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true } nexus3_repository {'zigzug': ensure => present }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.06 seconds
+Notice: /Stage[main]/Main/Nexus3_repository[zigzug]/ensure: created
+Notice: Finished catalog run in 0.14 seconds
+
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true } nexus3_repository {'zigzug': ensure => present }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.06 seconds
+Notice: Finished catalog run in 0.04 seconds
+```
