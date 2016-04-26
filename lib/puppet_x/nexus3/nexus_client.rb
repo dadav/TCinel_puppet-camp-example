@@ -3,7 +3,7 @@ require 'uri'
 require 'json'
 require 'base64'
 
-require File.expand_path('extdirect.rb')
+require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'extdirect.rb'))
 
 class NexusClient
   def initialize(base_url, admin_user, admin_password)
