@@ -119,3 +119,36 @@ Notice: Finished catalog run in 0.14 seconds
 Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.06 seconds
 Notice: Finished catalog run in 0.04 seconds
 ```
+
+* * *
+
+Added a new 'online' property to the nexus3_repository type.
+
+Had to introduce flushing and munging for this to work properly.
+
+# repo is currently online
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_repository
+nexus3_repository { 'zigzug':
+  ensure => 'present',
+  online => 'true',
+}
+
+# changes from online to offline
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true } nexus3_repository {'zigzug': ensure => present, online => false }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.06 seconds
+Notice: /Stage[main]/Main/Nexus3_repository[zigzug]/online: online changed 'true' to 'false'
+Notice: Finished catalog run in 0.07 seconds
+
+# doesn't attempt to change it again
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "resources { 'nexus3_repository': purge => true } nexus3_repository {'zigzug': ensure => present, online => false }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.06 seconds
+Notice: Finished catalog run in 0.06 seconds
+
+# repo is currently offline
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_repository
+nexus3_repository { 'zigzug':
+  ensure => 'present',
+  online => 'false',
+}
+
+* * *
