@@ -213,3 +213,55 @@ Notice: Finished catalog run in 0.07 seconds
 However I was using deep_merge was wrong and breaking everything horribly. Have removed it.
 
 * * *
+
+Added glorious autorequire. Now blobstores are created before dependent repos.
+
+```
+# create a bunch of repositories and blobstores in no particular order
+# puppet creates dependencies first, noice. unfortunately the resolver doesn't
+# work backwards for destruction :'(
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib \
+◀ puppet apply -e "
+◀ resources { 'nexus3_repository': purge => true }
+◀ resources { 'nexus3_blobstore': purge => true }
+◀
+◀ nexus3_repository {'repo1': ensure => present, online => true, blobstore => 'flubber', }
+◀ nexus3_repository {'repo2': ensure => present, online => true, blobstore => 'flubber', }
+◀ nexus3_repository {'repo3': ensure => present, online => false, blobstore => 'ooze', }
+◀ nexus3_repository {'repo4': ensure => present, online => false, blobstore => 'default', }
+◀
+◀ nexus3_blobstore {'flubber': ensure => present, path => '/nexus-data/blobs/flubber' }
+◀ nexus3_blobstore {'ooze': ensure => present, path => '/nexus-data/blobs/ooze' }
+◀ nexus3_blobstore {'default': ensure => present, path => '/nexus-data/blobs/default' }
+◀ "
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.09 seconds
+Notice: /Stage[main]/Main/Nexus3_repository[repo4]/ensure: created
+Notice: /Stage[main]/Main/Nexus3_repository[repo2]/ensure: created
+Notice: /Stage[main]/Main/Nexus3_repository[repo1]/ensure: created
+Notice: /Stage[main]/Main/Nexus3_blobstore[ooze]/ensure: created
+Notice: /Stage[main]/Main/Nexus3_blobstore[yetanotherblob]/ensure: removed
+Notice: /Stage[main]/Main/Nexus3_blobstore[anotherblob]/ensure: removed
+Notice: /Stage[main]/Main/Nexus3_repository[repo3]/ensure: created
+Notice: Finished catalog run in 0.56 seconds
+
+# reapply same manifest - no changes. yipee!
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib \
+puppet apply -e "
+resources { 'nexus3_repository': purge => true }
+resources { 'nexus3_blobstore': purge => true }
+
+nexus3_repository {'repo1': ensure => present, online => true, blobstore => 'flubber', }
+nexus3_repository {'repo2': ensure => present, online => true, blobstore => 'flubber', }
+nexus3_repository {'repo3': ensure => present, online => false, blobstore => 'ooze', }
+nexus3_repository {'repo4': ensure => present, online => false, blobstore => 'default', }
+
+nexus3_blobstore {'flubber': ensure => present, path => '/nexus-data/blobs/flubber' }
+nexus3_blobstore {'ooze': ensure => present, path => '/nexus-data/blobs/ooze' }
+nexus3_blobstore {'default': ensure => present, path => '/nexus-data/blobs/default' }
+"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.12 seconds
+Notice: Finished catalog run in 0.09 seconds
+
+```
+
+* * *

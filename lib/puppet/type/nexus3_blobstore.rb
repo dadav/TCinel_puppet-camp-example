@@ -28,4 +28,8 @@ Puppet::Type.newtype(:nexus3_blobstore) do
     end
   end
 
+  autorequire(:file) do
+    Nexus3::Client.config_path
+  end
+
 end
