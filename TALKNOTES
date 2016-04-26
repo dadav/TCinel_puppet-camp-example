@@ -7,3 +7,21 @@ Debug: Runtime environment: puppet_version=3.8.4, ruby_version=2.0.0, run_mode=u
 Error: Could not run: nexus3_repository has no providers and has not overridden 'instances'
 ```
 
+And this for `puppet apply`:
+
+```
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "nexus3_repository {'blah': }"
+Notice: Compiled catalog for tcinel.home.timcinel.com in environment production in 0.01 seconds
+Error: No set of title patterns matched the title "blah".
+```
+
+
+Now, with a namevar specified in the type class, `puppet apply` works:
+
+```
+▶ RUBYLIB=$(pwd)/lib puppet apply -e "nexus3_repository {'blah': }"
+Notice: Compiled catalog for tcinel.home.timcinel.com in environment production in 0.01 seconds
+Notice: Finished catalog run in 0.03 seconds
+```
+
+
