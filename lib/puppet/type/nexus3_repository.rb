@@ -27,4 +27,12 @@ Puppet::Type.newtype(:nexus3_repository) do
     end
   end
 
+  autorequire(:file) do
+    Nexus3::Client.config_path
+  end
+
+  autorequire(:nexus3_blobstore) do
+    self[:blobstore] if self[:blobstore]
+  end
+
 end

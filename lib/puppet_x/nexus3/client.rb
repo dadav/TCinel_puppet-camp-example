@@ -20,8 +20,12 @@ module Nexus3
       end
     end
 
+    def self.config_path
+      @@config_path ||= File.expand_path(File.join(Puppet.settings[:confdir], '/nexus3_conf.yaml'))
+    end
+
     def self.get_config
-      @@config ||= YAML.load_file(File.expand_path(File.join(Puppet.settings[:confdir], '/nexus3_conf.yaml')))
+      @@config ||= YAML.load_file(config_path)
     end
 
   end
