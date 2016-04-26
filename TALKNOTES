@@ -1,0 +1,9 @@
+
+With a practically empty nexus3_repository.rb type file, this is what we get with `puppet resource`:
+
+```
+▶ RUBYLIB=$(pwd)/lib puppet resource nexus3_repository --debug
+Debug: Runtime environment: puppet_version=3.8.4, ruby_version=2.0.0, run_mode=user, default_encoding=UTF-8
+Error: Could not run: nexus3_repository has no providers and has not overridden 'instances'
+```
+
