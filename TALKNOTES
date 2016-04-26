@@ -209,3 +209,7 @@ Notice: Finished catalog run in 0.07 seconds
 ```
 
 * * *
+
+However I was using deep_merge was wrong and breaking everything horribly. Have removed it.
+
+* * *

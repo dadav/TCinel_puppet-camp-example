@@ -1,13 +1,7 @@
-require 'deep_merge'
-
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'client.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'util.rb'))
 
 Puppet::Type.type(:nexus3_blobstore).provide(:rpc) do
-  BLOBSTORE_SKELETON = {
-    :type       => 'File',
-  }
-
   def initialize(value={})
     super(value)
   end
@@ -58,14 +52,12 @@ Puppet::Type.type(:nexus3_blobstore).provide(:rpc) do
 
   def map_resource_to_data
     [
-      BLOBSTORE_SKELETON.deep_merge(
         {
           :name       => resource[:name],
           :type       => resource[:type],
           :path       => resource[:path],
           :attributes => "{\"file\":{\"path\":\"#{resource[:path]}\"}}" 
         }
-      )
     ]
   end
 
