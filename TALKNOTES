@@ -182,3 +182,34 @@ Notice: Finished catalog run in 0.06 seconds
 ```
 
 * * *
+
+Added a nexus3_blobstore type and provider
+
+```
+# no blobstores
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_blobstore
+
+
+# create a blobstore
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet apply -e "resources { 'nexus3_blobstore': purge => true } nexus3_blobstore {'flubber': ensure => present, path => '/nexus-data/blobs/flubber' }"
+Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.07 seconds
+Notice: /Stage[main]/Main/Nexus3_blobstore[flubber]/ensure: created
+Notice: Finished catalog run in 0.07 seconds
+
+# there's a blobstore now
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet resource nexus3_blobstorenexus3_blobstore { 'flubber':
+  ensure => 'present',
+  type   => 'File',
+}
+
+# kill the blobstore
+▶ RUBYLIB=/Users/tcinel/build/puppet-camp/lib puppet apply -e "resources { 'nexus3_blobstore': purge => true }"Notice: Compiled catalog for tcinel.office.atlassian.com in environment production in 0.02 seconds
+Notice: /Stage[main]/Main/Nexus3_blobstore[flubber]/ensure: removed
+Notice: Finished catalog run in 0.07 seconds
+```
+
+* * *
+
+However I was using deep_merge was wrong and breaking everything horribly. Have removed it.
+
+* * *

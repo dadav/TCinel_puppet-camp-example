@@ -1,24 +1,8 @@
-require 'deep_merge'
-
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'client.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', '..', 'puppet_x', 'nexus3', 'util.rb'))
 
 Puppet::Type.type(:nexus3_repository).provide(:rpc) do
   MAVEN_REPO_SKELETON = {
-    :attributes => {
-      :maven => {
-        :versionPolicy => :RELEASE,
-        :layoutPolicy => :STRICT,
-      },
-      :storage => {
-        :strictContentTypeValidation => :true,
-        :writePolicy => :ALLOW_ONCE,
-      },
-    },
-    :format => '',
-    :type => '',
-    :url => '',
-    :recipe => 'maven2-hosted',
   }
 
   def initialize(value={})
@@ -85,17 +69,25 @@ Puppet::Type.type(:nexus3_repository).provide(:rpc) do
 
   def map_resource_to_data
     [
-      MAVEN_REPO_SKELETON.deep_merge(
         {
           :name    => resource[:name],
           :online  => Nexus3::Util.sym_to_bool(resource[:online]),
           :attributes => {
+            :maven => {
+              :versionPolicy => :RELEASE,
+              :layoutPolicy => :STRICT,
+            },
             :storage => {
               :blobStoreName => resource[:blobstore],
+              :strictContentTypeValidation => :true,
+              :writePolicy => :ALLOW_ONCE,
             },
           },
+          :format => '',
+          :type => '',
+          :url => '',
+          :recipe => 'maven2-hosted',
         }
-      )
     ]
   end
 
